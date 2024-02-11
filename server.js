@@ -1,13 +1,32 @@
-if(process.env.NODE_ENV != 'production'){
+if(process.env.NODE_ENV != 'production'){ //used for checking if the code running in Production
     require("dotenv").config()
 }
 
-const express = require("express")
-const fs = require("fs")
-const mongoose = require("mongoose")
-const bcrypt = require("bcrypt")
+const express = require("express");
+const fs = require("fs");
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const session = require("express-session");
+const multer = require("multer");
+const path = require("path");
+const methodOverride = require("method-override") 
 
-const User = require("./model/aspirants")
+//configuration for uploading images in a destination folder
+const uploadPath = path.join("public","uploads/blog images");
+const imageMimeTypes = ["image/jpeg","image/png","image/gif"];
+const upload = multer({
+    dest : uploadPath,
+   fileFilter : (req,file, callback) => {
+        
+        callback(null,imageMimeTypes.includes(file.mimetype));
+    }
+})
+
+//const upload = multer({ dest: 'uploads/' })
+
+const User = require("./model/aspirants");
+
+const Blog = require("./model/blogs");
 
 async function getUsers(callback){
     try{
@@ -43,7 +62,48 @@ app.set('view engine', 'html');
 
 app.use(express.static('public'));
 
-app.get("/",(req,res) => {
+app.use(session({
+    secret: 'my secret',
+    resave: false,
+    saveUninitialized: true
+}))
+
+app.use(methodOverride('_method'))
+
+  // middleware to test if authenticated
+function isAuthenticated (req, res, next) {
+    //console.log(req.session.user);
+
+    if (req.session.user){
+        return next()
+    } 
+    
+    return res.redirect("/login");
+}
+
+
+function isNotAuthenticated (req, res, next) {
+    if (req.session.user){
+        return res.redirect("/");
+    }
+    
+    next(); 
+}
+
+function createSession(obj){
+   
+    return obj;
+ }
+
+ /*async function saveData(data){
+    const user = await User.create(data);
+
+    await user.save();
+
+    console.log(user);
+}*/
+
+app.get("/login",isNotAuthenticated,(req,res) => {
     //console.log("Hello World");
 
     
@@ -68,7 +128,7 @@ app.get("/loginPage",(req,res) => {
    
 })
 
-app.post("/users",async (req,res) => {
+app.post("/users",isNotAuthenticated,async (req,res) => {
     console.log("Inside Console /login v2");
     console.log(req.body);
     let reqCredentials = req.body ? req.body : {};
@@ -80,7 +140,9 @@ app.post("/users",async (req,res) => {
     if(userCred){
         let matchPass = await bcrypt.compare(reqCredentials.password, userCred.password);
         if(matchPass){
-        res.send({"credential" : true});
+            req.session.user = createSession(userCred);   
+            res.send({"credential" : true});
+            //res.redirect("/");
         }
         else{
             res.send({"credential" : false});    
@@ -92,14 +154,47 @@ app.post("/users",async (req,res) => {
    
 })
 
+app.post("/blog-create",isAuthenticated,upload.single('blogImage'),async (req,res) =>{
+    //app.post("/blog-create",upload.none(),async (req,res) =>{
+    console.log("<------------Inside blog-create----->");
+    const filename = req.file != null ? req.file.filename : null;
+    console.log(req.file);
+
+    console.log(req.body);
+
+    const blog = new Blog({
+        title : req.body.title,
+        content : req.body.content,
+        blogImage : filename
+    })
+
+    await blog.save();
+
+    //res.send(req.file);
+    res.redirect("/")
+
+})
+
+/*app.post("/upload",upload.single('avatar'),(req,res) => {
+    console.log("Inside Upload");
+    console.log(req.file);
+    res.json(req.file);
+    
+})*/
+
 
 const loginRouter = require("./routes/register")
 
-app.use("/register",loginRouter);
+app.use("/register",isNotAuthenticated,loginRouter);
 
 const personalSpaceRouter = require("./routes/library")
 
-app.use("/custom",personalSpaceRouter);
+app.use("/",isAuthenticated,personalSpaceRouter);
+
+app.delete("/logout",isAuthenticated, (req,res) => {
+    req.session.destroy(() => console.log("Session has expired"));
+    res.redirect("/login")
+})
 
 //for hosting use the first the server will dynamically allocate port
 app.listen(process.env.PORT || 3000)

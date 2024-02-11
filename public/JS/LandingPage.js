@@ -39,7 +39,11 @@ const platformDIv = document.getElementById("platformMainDiv")
     });
   })
   .catch(error => console.error(error))*/
-document.getElementById("loginId").addEventListener("click",function(){
+let loginId = document.getElementById("loginId");
+if(loginId){
+
+
+loginId.addEventListener("click",function(){
   var credentialObj = new Object();
   let userName = document.getElementById("userNameId");
 
@@ -66,12 +70,14 @@ document.getElementById("loginId").addEventListener("click",function(){
     }
     else{
       incorrectDiv.parentElement.classList.add("d-none")
-      window.location.href = '/custom'
+      window.location.href = '/'
     }
 
 })
 .catch(error => console.log(error))
 })
+
+}
   /*$("#loginId").on("click",function(){
    
 })*/

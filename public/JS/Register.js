@@ -53,7 +53,9 @@ $(document).ready(function() {
             obj["email"] =  $("#email").val();
             obj["address"] =  $("#address").val();
 
-            var urlStr = "http://localhost:3000/register";
+            //var urlStr = "http://localhost:3000/register";
+
+            var urlStr="/register";
 
             console.log(obj);
             $.ajax({
