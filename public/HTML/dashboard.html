@@ -1,7 +1,10 @@
 <header style ="border-block-end: 1px solid">
     <div class ="row">
         <div class ="col text-end">
-            <input placeholder="Search"></input>
+          <form id="searchQuery" action="/search" method="POST">
+              <input type="text" name="searchQuery" placeholder="Enter your search">
+              <!--button type="submit" >Search</button-->
+          </form>
         </div>
         <div class ="col">
             <button class ="btn btn-xs btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#blogModal">Add New Content <i class ="fa fa-add"></i></button>
@@ -22,6 +25,28 @@
         </div>
     </div>
 </header>
+<div class="mt-4 ms-3">
+  <div class ="row">
+    <% blog_list.forEach(function(item, index) { %>
+      <div class ="col-4 content-card-container" uid ="<%= item._id%>" >
+        <div class ="row">
+          <div class ="col-4">
+            <img src="uploads/blog images/<%= item.blogImage || "" %>" alt="Girl in a jacket" width="200" height="200">
+          </div>
+          <div class ="col-8">
+              <div class ="row">
+                <div class ="content-header">
+                  <%= item.title || "" %>
+                </div>
+                <div class ="content-synopse">
+                  <%= item.content || "" %>  
+                </div>
+              </div>
+          </div>
+        </div>
+   </div>
+  <% }); %>
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="blogModal" tabindex="-1" aria-labelledby="blogModalLabel" aria-hidden="true">
@@ -58,3 +83,23 @@
       </div>
     </div>
   </div>
+  <script>
+          const form = document.querySelector('#searchQuery');
+      const input = document.querySelector('input[name="searchQuery"]');
+
+      // Debounce the form submission
+      const debouncedSubmit = _.debounce(() => {
+          form.submit();
+      }, 1000); // Adjust the delay as needed
+
+      input.addEventListener('input', () => {
+          debouncedSubmit();
+      });
+
+      $("#platformMainDiv .content-card-container").on("click",(e)=> { 
+        let requiredTag = e.currentTarget;
+        //console.log($(requiredTag).children(".content-header").text());
+        let id = $(requiredTag).attr("uid");
+        window.location.href = '/blogs/?id='+id;
+      });
+  </script>

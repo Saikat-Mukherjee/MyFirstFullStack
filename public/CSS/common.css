@@ -40,4 +40,22 @@
 
     .custom-required {
       color:red;
+    
+    }
+
+    .content-card-container{
+      border : 2px solid lightskyblue;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    .content-header {
+      font-weight: 600;
+      font-size : 25px;
+    }
+
+    .content-synopse {
+      max-height: 150px;
+      overflow:hidden;
+      text-overflow: ellipsis;
     }
