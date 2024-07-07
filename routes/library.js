@@ -20,41 +20,6 @@ async function getBlogList(searchQuery,callback){
     }
 }
 
-async function getBlogById(blogId,callback){
-    try{
-        const blog = await Blog.findById(blogId);
-        //console.log(blogs);
-        if(callback){
-            callback(blog);
-        }
-        return blog;
-
-    }catch(e){
-        console.log(e.message);
-    }
-}
-
-router.get("/?searchQuery=:searchQuery",async (req,res) => {
-    console.log("Inside get request");
-})
-
-router.get("/blogs",async (req,res) => {
-    console.log("Inside get request");
-    //console.log(req);
-    const searchQuery = req.query;
-    console.log(searchQuery);
-    let blogId = req.query.id;
-    console.log(blogId);   
-    let blog = await getBlogById(blogId);
-    res.json(blog);
-})
-
-router.get("/blogs/?id=:id",async (req,res) => {
-    console.log("Inside get request");
-    let blogId = req.params.id;   
-    let blog = await getBlogById(blogId);
-    res.json(blog);
-})
 
 router.get("/",async (req,res) => {
     //res.send("You are inside your personal realm");
@@ -62,7 +27,7 @@ router.get("/",async (req,res) => {
     console.log("Inside personal space " + req.session.user.name);
     let blogList = await getBlogList();
     
-    fs.readFile("./public/HTML/dashboard.html",'utf8',function(err,data){
+   /*  fs.readFile("./public/HTML/dashboard.html",'utf8',function(err,data){
         if(err){
             console.log(err);
             return;
@@ -74,7 +39,34 @@ router.get("/",async (req,res) => {
 
         //res.render("LandingPage", {backend_template : template({test_header : 'Hello Nested back'})})
         res.render("LandingPage", {backend_template : template_content})
-    })
+    }) */
+
+        fs.readFile("./public/HTML/logged_user.html",'utf8',function(err,data){
+            if(err){
+                console.log(err);
+                return;
+            }
+            
+            var template = ejs.compile(data);
+            //console.log(blogList);
+            //let template_content = template({'blog_obj' : blog});
+            var template_content;
+            fs.readFile("./public/HTML/dashboard.html",'utf8',function(err,data){
+                if(err){
+                    console.log(err);
+                    return;
+                }
+                let template2 = ejs.compile(data);
+                //let template_content2 = template2({'blog_obj' : blog, "comment_list" : [], "blog_List" : otherBlogs });
+                let template_content2 = template2({'blog_list' : blogList});
+                let template_content = template({'module_template' : template_content2});
+    
+                res.render("LandingPage", {backend_template : template_content})
+            })
+    
+            //res.render("LandingPage", {backend_template : template({test_header : 'Hello Nested back'})})
+           
+        })
 })
 
 
@@ -98,6 +90,21 @@ router.post("/search",async (req,res) => {
         //res.render("LandingPage", {backend_template : template({test_header : 'Hello Nested back'})})
         res.render("LandingPage", {backend_template : template_content})
     })
+})
+
+router.post("/postComment",async(req,res) =>{
+    console.log("Inside post comment");
+    let comment = req.body;
+    console.log(comment);
+    /*let blogId = req.body.blogId;
+    let commentId = req.body.commentId;
+    let commentObj = {
+        "commentId" : commentId,
+        "comment" : comment.comment,
+        "commenter" : comment.commenter,
+        "commenterId" : comment.commenterId,
+        "blogId" : blogId
+        }*/
 })
 
 

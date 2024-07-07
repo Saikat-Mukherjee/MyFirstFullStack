@@ -191,6 +191,10 @@ const personalSpaceRouter = require("./routes/library")
 
 app.use("/",isAuthenticated,personalSpaceRouter);
 
+const blogPageRouter = require("./routes/blogPage");
+
+app.use("/blogs",isAuthenticated,blogPageRouter);
+
 app.delete("/logout",isAuthenticated, (req,res) => {
     req.session.destroy(() => console.log("Session has expired"));
     res.redirect("/login")

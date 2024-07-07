@@ -59,3 +59,30 @@
       overflow:hidden;
       text-overflow: ellipsis;
     }
+
+    .blog-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .blog-body{
+      /*max-height: 150px;*/
+      max-height: 100%;
+      overflow:hidden;
+      text-overflow: ellipsis;      
+    }
+
+    .account-options {
+      display: flex;
+      padding-left: 10px;
+    }
+    .account-options:hover{
+      cursor: pointer;
+      color: #1e2125;
+      background-color: #e9ecef;
+    }
+    
+    .material-symbols-outlined{
+      padding-right: 5px;
+    }
+

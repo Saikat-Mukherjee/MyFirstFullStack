@@ -1,0 +1,75 @@
+<div class ="row" style="height: 90vh;">
+    <div class ="col-10" style="height: 100%;">
+        <div class ="row" style="height: 50%;">
+            <div class ="col-12">
+                <div class ="blog-title">
+                    <%= blog_obj.title || "" %>
+                </div>
+            </div>
+            <div class ="col-12">
+                <div class ="blog-body">
+                    <%= blog_obj.content || "" %>  
+                </div>
+            </div>
+            <div class ="col-12">
+                <div class ="blog-footer d-flex">
+                    <span role='button' class="material-symbols-outlined">
+                        thumb_up
+                    </span> <%= blog_obj.likes || 0 %>
+                    <span role='button' class="material-symbols-outlined">
+                        thumb_down
+                    </span> <%= blog_obj.dislikes || 0 %>
+                    <!--i class="fa fa-comment"> Comment</i-->
+                </div>
+            </div>
+        </div>
+        <div class ="row">
+            <div class ="col-12">
+                <form method="POST" action="/postComment"> 
+                <div class ="user-blog-comment-container">
+                    <input placeholder="Write a comment..." name="blog-comment" style="width: 80%;">
+                    <button type="submit">
+                      Post
+                    </button>
+                </div>
+                </form>
+              </div>
+            </div>
+            <% comment_list.forEach(function(item, index) { %>
+                <div class="col-12">
+                    <div class="comment-body">
+                        <div class="comment-container">
+                            <div class="comment-body-title">
+                                <i class="fa fa-user"></i> <%= item.user_name || "" %> <%= item.last_change_time || "" %>
+                            </div>
+                            <div class="comment-body-content">
+                                <%= item.content || "" %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+            
+            <div class ="col-12">
+                
+            </div>
+            <div class ="col-12">
+                
+            </div>
+        </div>
+    </div>
+    <div class ="col-2">
+        <div class ="row">
+            <% blog_List.forEach(function(item, index) { %>
+            <div class ="col-12">
+                <div class ="blog-thumb-nail">
+                    <%= item.blogImage || "" %>
+                </div>
+                <div class ="blog-thumb-nail-title">
+                    <%= item.title || "" %>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+    </div>
+</div>

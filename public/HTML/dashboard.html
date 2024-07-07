@@ -1,9 +1,8 @@
-<header style ="border-block-end: 1px solid">
+<!--header style ="border-block-end: 1px solid">
     <div class ="row">
         <div class ="col text-end">
           <form id="searchQuery" action="/search" method="POST">
               <input type="text" name="searchQuery" placeholder="Enter your search">
-              <!--button type="submit" >Search</button-->
           </form>
         </div>
         <div class ="col">
@@ -24,7 +23,7 @@
             </div>
         </div>
     </div>
-</header>
+</header-->
 <div class="mt-4 ms-3">
   <div class ="row">
     <% blog_list.forEach(function(item, index) { %>
@@ -100,6 +99,8 @@
         let requiredTag = e.currentTarget;
         //console.log($(requiredTag).children(".content-header").text());
         let id = $(requiredTag).attr("uid");
-        window.location.href = '/blogs/?id='+id;
+        //window.location.href = '/blogs/?id='+id;
+        window.location.replace('/blogs?id=' + id);
+
       });
   </script>

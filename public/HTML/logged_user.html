@@ -1,0 +1,39 @@
+<header style ="border-block-end: 1px solid">
+    <div class ="row">
+        <div class ="col text-end">
+          <form id="searchQuery" action="/search" method="POST">
+              <input type="text" name="searchQuery" placeholder="Enter your search">
+              <!--button type="submit" >Search</button-->
+          </form>
+        </div>
+        <div class ="col">
+            <!--button class ="btn btn-xs btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#blogModal" title="Add New Content"></button-->
+            <span class="btn btn-xs btn-primary mt-2 material-symbols-outlined" data-bs-toggle="modal" data-bs-target="#blogModal" title="Add New Content">
+              add
+              </span>
+        </div>
+        <div class ="col text-end">
+            <div class="dropdown">
+                <button type="button" id ="logoutId" class ="mt-2" data-bs-toggle="dropdown" aria-expanded="false" style ="border-radius: 10rem;padding: 1px;">
+                  <img draggable="false" alt="Avatar image" height="32" width="32"src ="https://yt3.ggpht.com/yti/AGOGRCoPNLGT_fH41pRre4kxvE__v3zVT60pcoaNbQ=s88-c-k-c0x00ffffff-no-rj-mo" style="border-radius: 30px;">
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="logoutId">
+                  <li class ="account-options"><span class="material-symbols-outlined">
+                    settings
+                    </span>Change Settings</li>
+                  <form method="POST" action="/logout?_method=DELETE"> 
+                    <!--li><button class="dropdown-item" type="submit"></li-->
+                    <li class ="account-options">
+                      <button class="dropdown-item d-flex">
+                        <span class="material-symbols-outlined" type="submit">
+                          logout
+                          </span>Log Out
+                      </button>
+                    </li>
+                  </form>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+<%- locals.module_template || "" %>
