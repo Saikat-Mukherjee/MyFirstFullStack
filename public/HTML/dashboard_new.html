@@ -1,0 +1,78 @@
+<div class="mt-4 ms-3">
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 p-4">
+        <% blog_list.forEach(function(item, index) { %>
+        <div class="col">
+          <div class="card h-100"  uid ="<%= item._id%>">
+            <img src="uploads/blog images/<%= item.blogImage || "" %>" class="card-img-top" width="200" height="200" alt="...">
+            <div class="card-body">
+              <h5 class="card-title"><%= item.title || "" %></h5>
+              <p class="card-text content-synopse"><%= item.content || "" %>  </p>
+            </div>
+            <div class="card-footer">
+              <small class="text-muted">Last updated 3 mins ago</small>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="blogModal" tabindex="-1" aria-labelledby="blogModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="blogModalLabel">Blog Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <form action="/blog-create" method="post" enctype="multipart/form-data">
+          <div class ="row">
+            <div class ="col-12">
+              <label class ="form-label">Title <span class ="custom-required">*</span></label>
+              <input type ="text" id="blog-title" class="form-control" name ="title" placeholder="Enter Blog Title"/>
+            </div>
+            <div class ="col-12">
+              <label class ="form-label">Content <span class ="custom-required">*</span></label>
+              <textarea type ="text" id="blog-content" rows="5" style="resize: none;" name ="content" class="form-control" placeholder="Enter Blog Content"></textarea>
+            </div>
+          <div class ="col-12">
+            <label class ="form-label">Upload Image</label>
+              <!--input type ="file"   name ="blogImage" placeholder="Enter Blog Content"></input-->
+              <input type="file" id="blog-img-upload-text" class="form-control" name="blogImage"/>
+              <button id ="blog-img-upload" type="submit">upload</button>
+          </div>
+          </div>  
+        </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button"  class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+          const form = document.querySelector('#searchQuery');
+      const input = document.querySelector('input[name="searchQuery"]');
+
+      // Debounce the form submission
+      const debouncedSubmit = _.debounce(() => {
+          form.submit();
+      }, 1000); // Adjust the delay as needed
+
+    /*   input.addEventListener('input', () => {
+          debouncedSubmit();
+      }); */
+
+      let div = "#platformMainDiv .content-card-container";
+      let div2 = "#platformMainDiv .card";
+      $(div2).on("click",(e)=> { 
+        let requiredTag = e.currentTarget;
+        //console.log($(requiredTag).children(".content-header").text());
+        let id = $(requiredTag).attr("uid");
+        //window.location.href = '/blogs/?id='+id;
+        window.location.replace('/blogs?id=' + id);
+
+      });
+  </script>

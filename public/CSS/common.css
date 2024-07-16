@@ -1,5 +1,5 @@
 .container-fluid{
-    position: absolute;
+   /* position: absolute;*/
   }
   
   .login-card{
@@ -55,7 +55,8 @@
     }
 
     .content-synopse {
-      max-height: 150px;
+      white-space: nowrap; 
+      /*max-height: 150px;*/
       overflow:hidden;
       text-overflow: ellipsis;
     }
@@ -85,4 +86,25 @@
     .material-symbols-outlined{
       padding-right: 5px;
     }
+
+    /*******Media Queries*****************/
+    @media screen and (max-width: 768px) {
+      /*.content-card-container{
+        width: 100%;
+        margin-right: 0px;
+        }*/
+       
+        .login-card{
+          width: 60%;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+    
+      .login-card{
+        top:10rem;
+        width: 100%;
+      }
+  }
+  
 

@@ -2,7 +2,7 @@
     <div class ="col-10" style="height: 100%;">
         <div class ="row" style="height: 50%;">
             <div class ="col-12">
-                <div class ="blog-title">
+                <div class ="blog-title fs-2 text">
                     <%= blog_obj.title || "" %>
                 </div>
             </div>
@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class ="col-12">
-                <div class ="blog-footer d-flex">
+                <div class ="blog-footer d-flex float-end">
                     <span role='button' class="material-symbols-outlined">
                         thumb_up
                     </span> <%= blog_obj.likes || 0 %>
@@ -25,25 +25,26 @@
         </div>
         <div class ="row">
             <div class ="col-12">
-                <form method="POST" action="/postComment"> 
-                <div class ="user-blog-comment-container">
-                    <input placeholder="Write a comment..." name="blog-comment" style="width: 80%;">
-                    <button type="submit">
+                <form method="POST" action="/postComment?id=<%= blog_obj._id || "" %>"> 
+                <div class ="user-blog-comment-container d-flex">
+                    <input placeholder="Write a comment..." name="blog-comment" style="width: 80%;" class="form-control form-control-sm">
+                    <button type="submit" class="btn btn-primary btn-sm rounded">
                       Post
                     </button>
                 </div>
                 </form>
-              </div>
             </div>
+        </div>
+        <div class="row">
             <% comment_list.forEach(function(item, index) { %>
                 <div class="col-12">
                     <div class="comment-body">
                         <div class="comment-container">
                             <div class="comment-body-title">
-                                <i class="fa fa-user"></i> <%= item.user_name || "" %> <%= item.last_change_time || "" %>
+                                <i class="fa fa-user"></i> <span class ="fw-bold"><%= getUserName(item.commentBy || "") %></span> <span class="fw-light fs-6"><%= getFormattedTime(item.commentDate || "") %></span>
                             </div>
-                            <div class="comment-body-content">
-                                <%= item.content || "" %>
+                            <div class="comment-body-content fs-5 text">
+                                <%= item.comment || "" %>
                             </div>
                         </div>
                     </div>
@@ -59,14 +60,18 @@
         </div>
     </div>
     <div class ="col-2">
-        <div class ="row">
+        <div class ="row g-4">
             <% blog_List.forEach(function(item, index) { %>
             <div class ="col-12">
-                <div class ="blog-thumb-nail">
-                    <%= item.blogImage || "" %>
-                </div>
-                <div class ="blog-thumb-nail-title">
-                    <%= item.title || "" %>
+                <div class="card h-100">
+                    <img src="uploads/blog images/<%= item.blogImage || "" %>" class="card-img-top" width="200" height="200" alt="...">
+                    <div class="card-body">
+                      <h5 class="card-title blog-thumb-nail-title"> <%= item.title || "" %></h5>
+                      <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                    </div>
+                    <div class="card-footer">
+                      <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
                 </div>
             </div>
             <% }); %>

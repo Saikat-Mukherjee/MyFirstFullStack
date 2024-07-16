@@ -4,6 +4,7 @@ const router = express.Router()
 const ejs = require("ejs")
 
 const Blog = require("../model/blogs");
+const BlogComment = require("../model/blogComments");
 
 async function getBlogList(searchQuery,callback){
     searchQuery = searchQuery || "";
@@ -41,7 +42,7 @@ router.get("/",async (req,res) => {
         res.render("LandingPage", {backend_template : template_content})
     }) */
 
-        fs.readFile("./public/HTML/logged_user.html",'utf8',function(err,data){
+        fs.readFile("./public/HTML/common_navbar.html",'utf8',function(err,data){
             if(err){
                 console.log(err);
                 return;
@@ -51,7 +52,7 @@ router.get("/",async (req,res) => {
             //console.log(blogList);
             //let template_content = template({'blog_obj' : blog});
             var template_content;
-            fs.readFile("./public/HTML/dashboard.html",'utf8',function(err,data){
+            fs.readFile("./public/HTML/dashboard_new.html",'utf8',function(err,data){
                 if(err){
                     console.log(err);
                     return;
@@ -95,16 +96,30 @@ router.post("/search",async (req,res) => {
 router.post("/postComment",async(req,res) =>{
     console.log("Inside post comment");
     let comment = req.body;
+    let blogId = req.query.id;
     console.log(comment);
-    /*let blogId = req.body.blogId;
-    let commentId = req.body.commentId;
-    let commentObj = {
-        "commentId" : commentId,
-        "comment" : comment.comment,
-        "commenter" : comment.commenter,
-        "commenterId" : comment.commenterId,
-        "blogId" : blogId
-        }*/
+    console.log(blogId);
+    console.log("session :",req.session);
+    let userName = req.session.user?.name;
+    let userId = req.session.user?._id;
+    //  let blogId = req.body.blogId;
+    //let commentId = req.body.commentId;
+     let commentObj = {
+        "comment" : comment['blog-comment'],
+        "commenter" : userName,
+        "commentBy" : userId,
+        "blogId" : blogId,
+        "commentDate" : new Date()
+    }
+
+    console.log(commentObj);
+
+    const blogComment = new BlogComment(commentObj)
+
+    await blogComment.save();
+
+    //res.send(req.file);
+    res.redirect("/")
 })
 
 
