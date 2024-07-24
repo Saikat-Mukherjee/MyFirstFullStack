@@ -25,10 +25,10 @@ async function getBlogById(blogId,callback){
     }
 }
 
-async function getOtherBlogList(blogId,callback){
+async function getOtherBlogList(blogId,limit,skip,callback){
     try{
         //const blog = await Blog.findById(blogId);
-        const otherBlogs = await Blog.find({}).where("_id").ne(blogId);
+        const otherBlogs = await Blog.find({}).where("_id").ne(blogId).limit(Number(limit)).skip(skip);
         if(callback){
             callback(blog);
         }
@@ -122,14 +122,18 @@ router.use(express.static(path.join(__dirname, 'public'))); */
 
 router.get("/",async (req,res) =>{
 
-    console.log("Inside get request");
+    console.log("Inside a Blog");
     //console.log(req);
     const searchQuery = req.query;
     console.log(searchQuery);
     let blogId = req.query.id;
+    //const { page = 1, limit = 10 } = req.query;
+    const page = 1, limit = 10;
+    // Calculate the number of documents to skip
+    const skip = (page - 1) * limit;
     //console.log(blogId);   
     let blog = await getBlogById(blogId);
-    let otherBlogs = await getOtherBlogList(blogId);
+    let otherBlogs = await getOtherBlogList(blogId,limit,skip);
     let blogComments = await getBlogComments(blogId);
     let aspirantList = await getAllAspirants();
     aspirantObj = aspirantList.reduce((acc, item) => {
@@ -140,7 +144,7 @@ router.get("/",async (req,res) =>{
     console.log(blogComments);
     //console.log(otherBlogs);
     //res.json(blog);
-    fs.readFile("./public/HTML/logged_user.html",'utf8',function(err,data){
+    fs.readFile("./public/HTML/common_navbar.html",'utf8',function(err,data){
         if(err){
             console.log(err);
             return;

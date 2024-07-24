@@ -69,6 +69,39 @@ $(document).ready(function() {
             });
         })
 
+        $("#formUpdate").on("click",function(){
+            if(!validateForm()){
+                return;    
+            }
+
+            
+            var obj = {};
+            obj["name"] =  $("#name").val();
+            obj["dob"] =  $("#dob").val();
+            obj["phone"] =  $("#phone").val();
+            obj["email"] =  $("#email").val();
+            obj["address"] =  $("#address").val();
+
+            //var urlStr = "http://localhost:3000/register";
+
+            var urlStr="/settings";
+
+            console.log(obj);
+            $.ajax({
+                type: "POST",
+                url: urlStr,
+                data: obj,
+                success: function(data){
+                    console.log(data);
+                    //alert(`Submit button has been successfully clicked. Password : ${obj[password]} `);
+                    window.location.href = '/';
+                },
+               // dataType: dataType
+            });
+        })
+
+
+
          
   });
   

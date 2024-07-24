@@ -72,13 +72,14 @@ router.get("/",async (req,res) => {
 
 
 router.post("/search",async (req,res) => {
-    console.log("Inside post request");
+    console.log("Inside search request");
+    //console.log(req);
     console.log(req.body);
     let searchQuery = req.body.searchQuery;
     let blogList = await getBlogList(searchQuery);
     //res.json(req.body);
 
-    fs.readFile("./public/HTML/dashboard.html",'utf8',function(err,data){
+    /*fs.readFile("./public/HTML/dashboard.html",'utf8',function(err,data){
         if(err){
             console.log(err);
             return;
@@ -90,7 +91,33 @@ router.post("/search",async (req,res) => {
 
         //res.render("LandingPage", {backend_template : template({test_header : 'Hello Nested back'})})
         res.render("LandingPage", {backend_template : template_content})
-    })
+    })*/
+        fs.readFile("./public/HTML/common_navbar.html",'utf8',function(err,data){
+            if(err){
+                console.log(err);
+                return;
+            }
+            
+            var template = ejs.compile(data);
+            //console.log(blogList);
+            //let template_content = template({'blog_obj' : blog});
+            var template_content;
+            fs.readFile("./public/HTML/dashboard_new.html",'utf8',function(err,data){
+                if(err){
+                    console.log(err);
+                    return;
+                }
+                let template2 = ejs.compile(data);
+                //let template_content2 = template2({'blog_obj' : blog, "comment_list" : [], "blog_List" : otherBlogs });
+                let template_content2 = template2({'blog_list' : blogList});
+                let template_content = template({'module_template' : template_content2, "search_query" : searchQuery});
+    
+                res.render("LandingPage", {backend_template : template_content})
+            })
+    
+            //res.render("LandingPage", {backend_template : template({test_header : 'Hello Nested back'})})
+           
+        })
 })
 
 router.post("/postComment",async(req,res) =>{

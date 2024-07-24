@@ -1,30 +1,36 @@
 <div class ="row">
     <div class ="col-6">
       <label>Name</label>
-      <input type ="text" placeholder ="Enter Name" class = "form-control" id ="name" required></input>
+      <input type ="text" placeholder ="Enter Name" class = "form-control" id ="name" value="<%-locals.user_details.name || '' %>" required></input>
     </div>
     <div class ="col-6">
       <label>Date of Birth</label>
-      <input type ="date" placeholder="Enter BirthDay" class = "form-control" id ="dob" required></input>
+      <input type ="date" placeholder="Enter BirthDay" class = "form-control" id ="dob" value="<%-getFormattedDate(locals.user_details.dob) || '' %>" required></input>
     </div>
     <div class ="col-6">
       <label>Phone No.</label>
-      <input type ="number" placeholder="Enter Mobile No." class = "form-control" id ="phone" required></input>
+      <input type ="number" placeholder="Enter Mobile No." class = "form-control" id ="phone"  value="<%-locals.user_details.phone || '' %>"  required></input>
     </div>
     <div class ="col-6">
       <label>Email</label>
-      <input type ="email" placeholder="Enter Email Id" class = "form-control" id ="email" required></input>
+      <input type ="email" placeholder="Enter Email Id" class = "form-control" id ="email"  value="<%-locals.user_details.email || '' %>" required></input>
     </div>
     <div class ="col-12">
       <label>Address</label>
-      <textarea type ="text" placeholder="Enter address" class = "form-control" id ="address" rows="4" required></textarea>
+      <textarea type ="text" placeholder="Enter address" class = "form-control" id ="address" rows="4" required><%-locals.user_details.address || '' %></textarea>
     </div>  
 </div>
 <div class ="row mt-2">
   <div class="col-12">
+    <% if (locals.user_details) { %>
+      <button class ="btn btn-xs btn-info" id ="formUpdate" style ="float: right;">
+            <i class ="fa fa-edit">Update</i>
+      </button>
+      <% } else { %>
       <button class ="btn btn-xs btn-info" id ="formSubmit" style ="float: right;">
           <i class ="fa fa-submit">Submit</i>
       </button>
+      <% } %>
   </div>
 </div>
 <script src="JS/Register.js"></script>

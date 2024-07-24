@@ -195,10 +195,14 @@ const blogPageRouter = require("./routes/blogPage");
 
 app.use("/blogs",isAuthenticated,blogPageRouter);
 
+const userPageConfiguration = require("./routes/settings");
+app.use("/settings",isAuthenticated,userPageConfiguration);
+
 app.delete("/logout",isAuthenticated, (req,res) => {
     req.session.destroy(() => console.log("Session has expired"));
     res.redirect("/login")
 })
+
 
 //for hosting use the first the server will dynamically allocate port
 app.listen(process.env.PORT || 3000)

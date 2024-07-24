@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand" href="/">
         <img src="../resourceDirectory/BlogHavenLogo3.jpg" alt="" width="30" height="30" class="d-inline-block align-text-top">
         BlogHaven
       </a>
@@ -8,24 +8,43 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <form class="d-flex me-auto w-50">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Search</button>
+        <form class="d-flex me-auto w-50" method="post" action="/search">
+            <input class="form-control me-2" name = "searchQuery" type="search" placeholder="Search" aria-label="Search" value="<%-locals.search_query || '' %>">
+            <button class="btn btn-outline-success mt-1 mb-1" type="submit">Search</button>
         </form>
+        <button class ="btn btn-primary btn-sm me-2 mt-2" title="Create Blog" data-bs-toggle="modal" data-bs-target="#blogModal"> Add</button>
         <ul class="navbar-nav mb-2 mb-lg-0 ">
           <li class="nav-item dropdown">
             <button type="button" id ="logoutId" class ="mt-2" data-bs-toggle="dropdown" aria-expanded="false" style ="border-radius: 10rem;padding: 1px;">
                 <img draggable="false" alt="Avatar image" height="32" width="32"src ="https://yt3.ggpht.com/yti/AGOGRCoPNLGT_fH41pRre4kxvE__v3zVT60pcoaNbQ=s88-c-k-c0x00ffffff-no-rj-mo" style="border-radius: 30px;">
               </button>
-            <ul class="dropdown-menu dropdown-menu-lg-start" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="#">Action</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
+            <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="navbarDropdown">
+              <li>
+                <form action="/settings">
+                  <button class="dropdown-item d-flex">
+                    <span class="material-symbols-outlined" type="submit">
+                      settings
+                    </span>Settings
+                  </button>
+                </form>
+             </li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Something else here</a></li>
+              <li>
+                <form method="POST" action="/logout?_method=DELETE"> 
+                  <button class="dropdown-item d-flex">
+                    <span class="material-symbols-outlined" type="submit">
+                      logout
+                      </span>Log Out
+                  </button>
+                </form>
+              </li>
             </ul>
           </li>
         </ul>
       </div>
     </div>
   </nav>
-  <%- locals.module_template || "" %>
+  <div id ="main-module-content">
+    <%- locals.module_template || "" %>
+  </div>
+  
