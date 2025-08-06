@@ -87,7 +87,7 @@ router.get("/",async(req,res) => {
             let template2 = ejs.compile(data);
             //let template_content2 = template2({'blog_obj' : blog, "comment_list" : [], "blog_List" : otherBlogs });
             let template_content2 = template2({"user_details" : userDetails ,"getFormattedDate" : getFormattedDate});
-            let template_content = template({'module_template' : template_content2});
+            let template_content = template({'module_template' : template_content2, "isLoggedIn" : true});
 
             res.render("LandingPage", {backend_template : template_content})
         })

@@ -1,24 +1,24 @@
-<div class ="row" style="height: 90vh;">
-    <div class ="col-10" style="height: 100%;">
-        <div class ="row" style="height: 50%;">
-            <div class ="col-12">
+<div class ="row" style="height: 90vh; padding: 20px;">
+    <div class ="col-10" style="height: 100%; padding-right: 30px;">
+        <div class ="row" style="height: auto; margin-bottom: 30px;">
+            <div class ="col-12" style="margin-bottom: 15px;">
                 <div class ="blog-title fs-2 text">
                     <%= blog_obj.title || "" %>
                 </div>
             </div>
-            <div class ="col-12">
+            <div class ="col-12" style="margin-bottom: 20px;">
                 <div class ="blog-body">
                     <%= blog_obj.content || "" %>  
                 </div>
             </div>
             <div class ="col-12">
                 <div class ="blog-footer d-flex float-end">
-                    <span role='button' class="material-symbols-outlined">
+                    <span id ="likeBtnId" role='button' class="material-symbols-outlined">
                         thumb_up
-                    </span> <%= blog_obj.likes || 0 %>
-                    <span role='button' class="material-symbols-outlined">
+                    </span> <span id="likeCount"><%= blog_obj.likes || 0 %></span>
+                    <span id ="disLikeBtnId" role='button' class="material-symbols-outlined">
                         thumb_down
-                    </span> <%= blog_obj.dislikes || 0 %>
+                    </span> <span id="dislikeCount"><%= blog_obj.dislikes || 0 %></span>
                     <!--i class="fa fa-comment"> Comment</i-->
                 </div>
             </div>
@@ -50,27 +50,20 @@
                     </div>
                 </div>
             <% }); %>
-            
-            <div class ="col-12">
-                
-            </div>
-            <div class ="col-12">
-                
-            </div>
         </div>
     </div>
     <div class ="col-2">
         <div class ="row g-4">
             <% blog_List.forEach(function(item, index) { %>
             <div class ="col-12">
-                <div class="card h-100">
-                    <img src="uploads/blog images/<%= item.blogImage || "" %>" class="card-img-top" width="200" height="200" alt="...">
+                <div class="card h-100" style="cursor: pointer;" onclick="window.location.href='/blog?id=<%= item._id %>'">
+                    <img src="uploads/blog images/<%= item.blogImage || "" %>" class="card-img-top" width="200" height="200" alt="<%= item.title || 'Blog image' %>">
                     <div class="card-body">
                       <h5 class="card-title blog-thumb-nail-title"> <%= item.title || "" %></h5>
-                      <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                      <p class="card-text"><%= item.content ? item.content.substring(0, 100) + '...' : 'No description available.' %></p>
                     </div>
                     <div class="card-footer">
-                      <small class="text-muted">Last updated 3 mins ago</small>
+                      <small class="text-muted">Last updated <%= item.updatedAt ? getFormattedTime(item.updatedAt) : 'recently' %></small>
                     </div>
                 </div>
             </div>
@@ -78,3 +71,73 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function(){
+        $('#likeBtnId').on('click',function(){
+            $(this).toggleClass("selected");
+            //$(this).removeClass("selected");
+            var likeCount = parseInt($('#likeCount').text());
+            console.log("likeCount = ",likeCount);
+
+            var isLiked = $(this).hasClass("selected") ? true : false;
+            console.log("isLiked = ",isLiked);
+            
+            fetch("/likeBlog?id=<%= blog_obj._id || "" %>",{
+            method: "POST",
+            headers:{
+                "Content-Type" : "application/json"
+            },
+            body : JSON.stringify({isLiked : true})
+            })
+            .then(response => response.json())
+            .then(data => {
+            console.log(data)
+            //let incorrectDiv = document.getElementById("incorrectCred");
+                if($(this).hasClass("selected")){
+                    likeCount++;
+                    $('#likeCount').text(likeCount);
+                    console.log("updated likeCount = ",likeCount);
+                }
+                else{
+                    likeCount--;
+                    $('#likeCount').text(likeCount);
+
+                }
+
+            })
+            .catch(error => console.log(error))
+            })
+
+
+        $('#disLikeBtnId').on('click',function(){
+            $(this).toggleClass("selected");
+            var dislikeCount = parseInt($('#dislikeCount').text());
+            console.log("dislikeCount = ",dislikeCount);
+
+            var isDisliked = $(this).hasClass("selected") ? true : false;
+            console.log("isDisliked = ",isDisliked);
+            
+            fetch("/dislikeBlog?id=<%= blog_obj._id || "" %>",{
+            method: "POST",
+            headers:{
+                "Content-Type" : "application/json"
+            },
+            body : JSON.stringify({isDisliked : true})
+            })
+            .then(response => response.json())
+            .then(data => {
+            console.log(data)
+                if($(this).hasClass("selected")){
+                    dislikeCount++;
+                    $('#dislikeCount').text(dislikeCount);
+                    console.log("updated dislikeCount = ",dislikeCount);
+                }
+                else{
+                    dislikeCount--;
+                    $('#dislikeCount').text(dislikeCount);
+                }
+            })
+            .catch(error => console.log(error))
+        })
+    })
+</script>

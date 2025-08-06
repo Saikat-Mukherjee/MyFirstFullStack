@@ -7,13 +7,16 @@
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div class="collapse navbar-collapse <=% locals.isLoggedIn ? '' : justify-content-end %>" id="navbarSupportedContent">
+        <% if (locals.isLoggedIn) { %>
         <form class="d-flex me-auto w-50" method="post" action="/search">
             <input class="form-control me-2" name = "searchQuery" type="search" placeholder="Search" aria-label="Search" value="<%-locals.search_query || '' %>">
             <button class="btn btn-outline-success mt-1 mb-1" type="submit">Search</button>
         </form>
         <button class ="btn btn-primary btn-sm me-2 mt-2" title="Create Blog" data-bs-toggle="modal" data-bs-target="#blogModal"> Add</button>
+        <% } %>
         <ul class="navbar-nav mb-2 mb-lg-0 ">
+          <% if (locals.isLoggedIn) { %>
           <li class="nav-item dropdown">
             <button type="button" id ="logoutId" class ="mt-2" data-bs-toggle="dropdown" aria-expanded="false" style ="border-radius: 10rem;padding: 1px;">
                 <img draggable="false" alt="Avatar image" height="32" width="32"src ="https://yt3.ggpht.com/yti/AGOGRCoPNLGT_fH41pRre4kxvE__v3zVT60pcoaNbQ=s88-c-k-c0x00ffffff-no-rj-mo" style="border-radius: 30px;">
@@ -40,6 +43,13 @@
               </li>
             </ul>
           </li>
+          <% } else { %>
+            <li class="nav-item dropdown">
+              <button type="button" id ="loginId" class ="btn btn-primary btn-sm me-2 mt-2" onclick= "window.location ='/'">
+                  Login
+              </button> 
+            </li>
+            <% } %>
         </ul>
       </div>
     </div>

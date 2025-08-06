@@ -5,6 +5,7 @@ const ejs = require("ejs")
 
 const Blog = require("../model/blogs");
 const BlogComment = require("../model/blogComments");
+const blogLikes = require("../model/blogLikes");
 
 async function getBlogList(searchQuery,callback){
     searchQuery = searchQuery || "";
@@ -18,6 +19,27 @@ async function getBlogList(searchQuery,callback){
 
     }catch(e){
         console.log(e.message);
+    }
+}
+
+async function updateLikes(userId,blogId,isLiked,callback){
+    try{
+        const likes = await blogLikes.find({userId : userId, blogId : blogId});
+        if(likes.length > 0){
+            let filter = {userId : userId, blogId : blogId};
+            let update = {isLiked : isLiked};
+            await blogLikes.updateOne(filter,update);
+        }
+        else{
+            let newLikes = new blogLikes({userId : userId, blogId : blogId, isLiked : isLiked});
+            await newLikes.save();
+        }
+
+        if(callback){
+            callback(likes);
+        }
+    }catch(e){
+        console.log("error ",e.message);
     }
 }
 
@@ -60,7 +82,7 @@ router.get("/",async (req,res) => {
                 let template2 = ejs.compile(data);
                 //let template_content2 = template2({'blog_obj' : blog, "comment_list" : [], "blog_List" : otherBlogs });
                 let template_content2 = template2({'blog_list' : blogList});
-                let template_content = template({'module_template' : template_content2});
+                let template_content = template({'module_template' : template_content2, "isLoggedIn" : true});
     
                 res.render("LandingPage", {backend_template : template_content})
             })
@@ -110,7 +132,7 @@ router.post("/search",async (req,res) => {
                 let template2 = ejs.compile(data);
                 //let template_content2 = template2({'blog_obj' : blog, "comment_list" : [], "blog_List" : otherBlogs });
                 let template_content2 = template2({'blog_list' : blogList});
-                let template_content = template({'module_template' : template_content2, "search_query" : searchQuery});
+                let template_content = template({'module_template' : template_content2, "search_query" : searchQuery, "isLoggedIn" : true});
     
                 res.render("LandingPage", {backend_template : template_content})
             })
@@ -147,6 +169,36 @@ router.post("/postComment",async(req,res) =>{
 
     //res.send(req.file);
     res.redirect("/")
+})
+
+router.post("/likeBlog",async (req,res)=>{
+    console.log("Inside like blog");
+    let isLiked = req.body.isLiked;
+    let blogId = req.query.id;
+    let userId = req.session.user?._id;
+   /* let bloglikes = BlogLikes.findById(blogId);
+    let likeCount = blog.likeCount + 1;
+    blog.likeCount = likeCount;
+    blog.save();*/
+    try{
+        await updateLikes(userId,blogId,isLiked);
+    }
+    catch(e){
+        console.log(e);
+    }
+
+    res.send({"ops" : "success"}).status(200);
+    
+})
+
+router.post("/disLikeBlog",()=>{
+    console.log("Inside dis like blog");
+    let blogId = req.query.id;
+    let userId = req.session.user?._id;
+    let blog = Blog.findById(blogId);
+    let likeCount = blog.likeCount - 1;
+    blog.likeCount = likeCount;
+    blog.save();
 })
 
 
