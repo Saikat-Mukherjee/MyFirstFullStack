@@ -145,6 +145,204 @@
       transition: all 0.3s ease;
     }
 
+    /* Sidebar scrollbar styling */
+    #sidebar-container {
+        scrollbar-width: thin;
+        scrollbar-color: #6c757d #f8f9fa;
+    }
+
+    #sidebar-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    #sidebar-container::-webkit-scrollbar-track {
+        background: #f8f9fa;
+        border-radius: 3px;
+    }
+
+    #sidebar-container::-webkit-scrollbar-thumb {
+        background: #6c757d;
+        border-radius: 3px;
+    }
+
+    #sidebar-container::-webkit-scrollbar-thumb:hover {
+        background: #495057;
+    }
+
+    /* Loading indicator styling */
+    .spinner-border-sm {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    /* Smooth fade-in animation for new cards */
+    .fade-in {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Loading skeleton for better UX */
+    .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+        0% {
+            background-position: 200% 0;
+        }
+        100% {
+            background-position: -200% 0;
+        }
+    }
+
+    /* Sidebar focus and accessibility styles */
+    #sidebar-container:focus {
+        outline: 2px solid #007bff;
+        outline-offset: 2px;
+    }
+
+    /* Button hover effects for load more actions */
+    .btn:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    /* Smooth transitions for indicators */
+    #loading-indicator, #error-indicator, #end-indicator, #load-more-btn {
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    /* Card loading state */
+    .card.loading {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    /* Responsive sidebar adjustments */
+    @media screen and (max-width: 768px) {
+        #sidebar-container {
+            height: 50vh !important;
+        }
+        
+        .blog-thumb-nail-title {
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Form validation styles */
+    .form-control:invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+
+    .form-control:valid {
+        border-color: #198754;
+    }
+
+    .form-control:focus:invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+
+    .form-control:focus:valid {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+    }
+
+    /* Button states */
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn.processing {
+        pointer-events: none;
+        opacity: 0.8;
+    }
+
+    /* Like/Dislike button processing state */
+    .material-symbols-outlined.processing {
+        opacity: 0.5;
+        pointer-events: none;
+        transform: scale(0.95);
+        transition: all 0.2s ease;
+    }
+
+    /* Comment validation feedback */
+    .text-danger {
+        font-size: 0.875rem;
+    }
+
+    .text-success {
+        font-size: 0.875rem;
+    }
+
+    /* Character count styling */
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .text-warning {
+        color: #ffc107 !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    /* Improved form styling */
+    .user-blog-comment-container {
+        position: relative;
+    }
+
+    .user-blog-comment-container input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    }
+
+    /* Loading states */
+    .fade-in-error {
+        animation: fadeInError 0.3s ease-in;
+    }
+
+    .fade-in-success {
+        animation: fadeInSuccess 0.3s ease-in;
+    }
+
+    @keyframes fadeInError {
+        from {
+            opacity: 0;
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        to {
+            opacity: 1;
+            background-color: transparent;
+        }
+    }
+
+    @keyframes fadeInSuccess {
+        from {
+            opacity: 0;
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+        to {
+            opacity: 1;
+            background-color: transparent;
+        }
+    }
+
     /*******Media Queries*****************/
     @media screen and (max-width: 768px) {
       /*.content-card-container{

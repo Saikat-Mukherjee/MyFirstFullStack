@@ -1,0 +1,14 @@
+<% blog_List.forEach(function(item, index) { %>
+<div class="col-12">
+    <div class="card h-100" style="cursor: pointer;" onclick="window.location.href='/blog?id=<%= item._id %>'">
+        <img src="uploads/blog images/<%= item.blogImage || '' %>" class="card-img-top" width="200" height="200" alt="<%= item.title || 'Blog image' %>">
+        <div class="card-body">
+            <h5 class="card-title blog-thumb-nail-title"><%= item.title || '' %></h5>
+            <p class="card-text"><%= item.content ? item.content.substring(0, 100) + '...' : 'No description available.' %></p>
+        </div>
+        <div class="card-footer">
+            <small class="text-muted">Last updated <%= item.updatedAt ? getFormattedTime(item.updatedAt) : 'recently' %></small>
+        </div>
+    </div>
+</div>
+<% }); %>

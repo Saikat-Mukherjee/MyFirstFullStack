@@ -128,7 +128,7 @@ router.get("/",async (req,res) =>{
     console.log(searchQuery);
     let blogId = req.query.id;
     //const { page = 1, limit = 10 } = req.query;
-    const page = 1, limit = 10;
+    const page = 1, limit = 5; // Reduced initial limit for better lazy loading
     // Calculate the number of documents to skip
     const skip = (page - 1) * limit;
     //console.log(blogId);   
@@ -185,6 +185,57 @@ router.post("/postComment",async(req,res) =>{
         "blogId" : blogId
         }*/
 })
+
+// API endpoint for lazy loading more blogs
+router.get("/api/more-blogs", async (req, res) => {
+    try {
+        const { currentBlogId, page = 1, limit = 5 } = req.query;
+        const skip = (page - 1) * limit;
+        
+        const moreBlogs = await getOtherBlogList(currentBlogId, limit, skip);
+        
+        // Render just the blog cards HTML
+        fs.readFile("./public/HTML/blog-card-template.html", 'utf8', function(err, data) {
+            if (err) {
+                console.log("Template file not found, using inline template");
+                // Inline template if file doesn't exist
+                let cardsHtml = '';
+                moreBlogs.forEach(item => {
+                    cardsHtml += `
+                    <div class="col-12">
+                        <div class="card h-100" style="cursor: pointer;" onclick="window.location.href='/blog?id=${item._id}'">
+                            <img src="uploads/blog images/${item.blogImage || ''}" class="card-img-top" width="200" height="200" alt="${item.title || 'Blog image'}">
+                            <div class="card-body">
+                                <h5 class="card-title blog-thumb-nail-title">${item.title || ''}</h5>
+                                <p class="card-text">${item.content ? item.content.substring(0, 100) + '...' : 'No description available.'}</p>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">Last updated ${item.updatedAt ? getFormattedTime(item.updatedAt) : 'recently'}</small>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                res.json({ 
+                    html: cardsHtml,
+                    hasMore: moreBlogs.length === parseInt(limit)
+                });
+            } else {
+                const template = ejs.compile(data);
+                const html = template({ 
+                    blog_List: moreBlogs, 
+                    getFormattedTime: getFormattedTime 
+                });
+                res.json({ 
+                    html: html,
+                    hasMore: moreBlogs.length === parseInt(limit)
+                });
+            }
+        });
+    } catch (error) {
+        console.error("Error loading more blogs:", error);
+        res.status(500).json({ error: "Failed to load more blogs" });
+    }
+});
 
 
 module.exports = router;
