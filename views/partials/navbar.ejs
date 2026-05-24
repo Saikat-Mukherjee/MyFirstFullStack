@@ -1,0 +1,167 @@
+<style>
+  .bh-nav {
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 0.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+  }
+  .bh-nav .navbar-brand {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .bh-nav .navbar-brand img { border-radius: 6px; object-fit: cover; }
+  .bh-nav .navbar-brand:hover { color: #111827; }
+  .bh-search-wrap {
+    position: relative;
+    flex: 0 1 340px;
+  }
+  .bh-search-wrap .bh-search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: #9ca3af;
+    pointer-events: none;
+    user-select: none;
+  }
+  .bh-search-wrap input[type=search] {
+    width: 100%;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 999px;
+    padding: 0.38rem 1rem 0.38rem 2.3rem;
+    font-size: 0.87rem;
+    background: #f9fafb;
+    color: #111827;
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  }
+  .bh-search-wrap input[type=search]:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    background: #fff;
+  }
+  .bh-write-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #111827;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.38rem 0.85rem;
+    font-size: 0.83rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .bh-write-btn:hover { background: #1f2937; color: #fff; }
+  .bh-write-btn .material-symbols-outlined { font-size: 0.95rem; }
+  .bh-avatar-btn {
+    border: none;
+    background: none;
+    padding: 2px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: box-shadow 0.18s;
+  }
+  .bh-avatar-btn:hover { box-shadow: 0 0 0 3px rgba(99,102,241,.2); }
+  .bh-avatar-btn img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+  .bh-dropdown {
+    border: 1.5px solid #f0f0f0;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.09);
+    padding: 0.3rem 0;
+    min-width: 155px;
+  }
+  .bh-dropdown-item {
+    display: flex !important;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.87rem;
+    color: #374151;
+    padding: 0.45rem 1rem;
+  }
+  .bh-dropdown-item:hover { background: #f9fafb; color: #111827; }
+  .bh-dropdown-item .material-symbols-outlined { font-size: 1rem; padding-right: 0; }
+  .bh-signin-btn {
+    background: #111827;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.38rem 0.9rem;
+    font-size: 0.83rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+  .bh-signin-btn:hover { background: #1f2937; }
+</style>
+
+<nav class="navbar navbar-expand-lg bh-nav">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+      <img src="/resourceDirectory/BlogHavenLogo3.jpg" alt="BlogHaven" width="28" height="28">
+      BlogHaven
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <% if (locals.isLoggedIn) { %>
+      <form class="bh-search-wrap mx-auto" method="post" action="/search">
+        <span class="material-symbols-outlined bh-search-icon">search</span>
+        <input type="search" name="searchQuery" placeholder="Search posts…" value="<%= locals.search_query || '' %>" autocomplete="off">
+      </form>
+      <% } %>
+      <div class="<%= locals.isLoggedIn ? '' : 'ms-auto' %> d-flex align-items-center gap-2">
+        <% if (locals.isLoggedIn) { %>
+        <button class="bh-write-btn" data-bs-toggle="modal" data-bs-target="#blogModal">
+          <span class="material-symbols-outlined">edit</span>Write
+        </button>
+        <div class="dropdown">
+          <button type="button" class="bh-avatar-btn" data-bs-toggle="dropdown" aria-expanded="false">
+            <img draggable="false" alt="Avatar"
+              src="https://yt3.ggpht.com/yti/AGOGRCoPNLGT_fH41pRre4kxvE__v3zVT60pcoaNbQ=s88-c-k-c0x00ffffff-no-rj-mo">
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end bh-dropdown">
+            <li>
+              <form action="/settings">
+                <button type="submit" class="dropdown-item bh-dropdown-item">
+                  <span class="material-symbols-outlined">settings</span>Settings
+                </button>
+              </form>
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+            <li>
+              <form method="POST" action="/logout?_method=DELETE">
+                <button type="submit" class="dropdown-item bh-dropdown-item">
+                  <span class="material-symbols-outlined">logout</span>Log out
+                </button>
+              </form>
+            </li>
+          </ul>
+        </div>
+        <% } else { %>
+        <button type="button" class="bh-signin-btn" onclick="window.location='/'">
+          Sign in
+        </button>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</nav>

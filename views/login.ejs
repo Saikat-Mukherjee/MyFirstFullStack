@@ -1,0 +1,139 @@
+<%- include('partials/header') %>
+
+<style>
+  .login-page {
+    min-height: 100vh;
+    background: #f5f6f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .login-wrap {
+    width: 100%;
+    max-width: 400px;
+  }
+  .login-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    text-decoration: none;
+  }
+  .login-brand img {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+  .login-brand span {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.01em;
+  }
+  .login-card-new {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 20px rgba(0,0,0,.07);
+    padding: 2.25rem 2rem 2rem;
+  }
+  .login-card-new h1 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.3rem;
+    line-height: 1.2;
+  }
+  .login-card-new .login-sub {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-bottom: 1.75rem;
+  }
+  .login-card-new .form-floating > .form-control {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 9px;
+    background: #fafafa;
+    font-size: 0.93rem;
+    color: #111827;
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  }
+  .login-card-new .form-floating > .form-control:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,.13);
+    background: #fff;
+    outline: none;
+  }
+  .login-card-new .form-floating label {
+    color: #9ca3af;
+    font-size: 0.88rem;
+  }
+  .login-btn {
+    width: 100%;
+    background: #111827;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: 0.68rem 1rem;
+    font-size: 0.93rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.1s;
+    margin-top: 1.25rem;
+  }
+  .login-btn:hover { background: #1f2937; }
+  .login-btn:active { transform: scale(0.98); }
+  .login-error {
+    font-size: 0.82rem;
+    color: #ef4444;
+    text-align: center;
+    margin-top: 0.6rem;
+    min-height: 1.1rem;
+  }
+  .login-footer-hint {
+    font-size: 0.82rem;
+    color: #9ca3af;
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+  .login-footer-hint a {
+    color: #6366f1;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .login-footer-hint a:hover { text-decoration: underline; }
+</style>
+
+<div class="login-page">
+  <div class="login-wrap">
+    <a class="login-brand" href="/">
+      <img src="/resourceDirectory/BlogHavenLogo3.jpg" alt="BlogHaven">
+      <span>BlogHaven</span>
+    </a>
+    <div class="login-card-new">
+      <h1>Welcome back</h1>
+      <p class="login-sub">Sign in to your account to continue</p>
+
+      <div class="d-flex flex-column gap-3">
+        <div class="form-floating">
+          <input type="text" class="form-control" id="userNameId" placeholder="Username or email" autocomplete="off">
+          <label for="userNameId">Username or email</label>
+        </div>
+        <div class="form-floating">
+          <input type="password" class="form-control" id="passwordId" placeholder="Password" autocomplete="off">
+          <label for="passwordId">Password</label>
+        </div>
+      </div>
+
+      <button class="login-btn" id="loginId">Sign in</button>
+      <div class="login-error d-none" id="incorrectCred">Incorrect username or password</div>
+    </div>
+
+    <p class="login-footer-hint">
+      Don't have an account? <a href="/register">Create one</a>
+    </p>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

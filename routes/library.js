@@ -1,7 +1,5 @@
 const express = require("express");
-const fs = require("fs")
 const router = express.Router()
-const ejs = require("ejs")
 
 const Blog = require("../model/blogs");
 const BlogComment = require("../model/blogComments");
@@ -70,102 +68,18 @@ async function updateLikes(userId, blogId, isLiked, callback) {
 }
 
 
-router.get("/",async (req,res) => {
-    //res.send("You are inside your personal realm");
-    console.log(req.params);
+router.get("/", async (req, res) => {
     console.log("Inside personal space " + req.session.user.name);
-    let blogList = await getBlogList();
-    
-   /*  fs.readFile("./public/HTML/dashboard.html",'utf8',function(err,data){
-        if(err){
-            console.log(err);
-            return;
-        }
-        
-        let template = ejs.compile(data);
-        //console.log(blogList);
-        let template_content = template({'blog_list' : blogList});
-
-        //res.render("LandingPage", {backend_template : template({test_header : 'Hello Nested back'})})
-        res.render("LandingPage", {backend_template : template_content})
-    }) */
-
-        fs.readFile("./public/HTML/common_navbar.html",'utf8',function(err,data){
-            if(err){
-                console.log(err);
-                return;
-            }
-            
-            var template = ejs.compile(data);
-            //console.log(blogList);
-            //let template_content = template({'blog_obj' : blog});
-            var template_content;
-            fs.readFile("./public/HTML/dashboard_new.html",'utf8',function(err,data){
-                if(err){
-                    console.log(err);
-                    return;
-                }
-                let template2 = ejs.compile(data);
-                //let template_content2 = template2({'blog_obj' : blog, "comment_list" : [], "blog_List" : otherBlogs });
-                let template_content2 = template2({'blog_list' : blogList});
-                let template_content = template({'module_template' : template_content2, "isLoggedIn" : true});
-    
-                res.render("LandingPage", {backend_template : template_content})
-            })
-    
-            //res.render("LandingPage", {backend_template : template({test_header : 'Hello Nested back'})})
-           
-        })
+    const blogList = await getBlogList();
+    res.render("dashboard", { blog_list: blogList, isLoggedIn: true });
 })
 
 
-router.post("/search",async (req,res) => {
+router.post("/search", async (req, res) => {
     console.log("Inside search request");
-    //console.log(req);
-    console.log(req.body);
-    let searchQuery = req.body.searchQuery;
-    let blogList = await getBlogList(searchQuery);
-    //res.json(req.body);
-
-    /*fs.readFile("./public/HTML/dashboard.html",'utf8',function(err,data){
-        if(err){
-            console.log(err);
-            return;
-        }
-        
-        let template = ejs.compile(data);
-        //console.log(blogList);
-        let template_content = template({'blog_list' : blogList});
-
-        //res.render("LandingPage", {backend_template : template({test_header : 'Hello Nested back'})})
-        res.render("LandingPage", {backend_template : template_content})
-    })*/
-        fs.readFile("./public/HTML/common_navbar.html",'utf8',function(err,data){
-            if(err){
-                console.log(err);
-                return;
-            }
-            
-            var template = ejs.compile(data);
-            //console.log(blogList);
-            //let template_content = template({'blog_obj' : blog});
-            var template_content;
-            fs.readFile("./public/HTML/dashboard_new.html",'utf8',function(err,data){
-                if(err){
-                    console.log(err);
-                    return;
-                }
-                let template2 = ejs.compile(data);
-                //let template_content2 = template2({'blog_obj' : blog, "comment_list" : [], "blog_List" : otherBlogs });
-                let template_content2 = template2({'blog_list' : blogList});
-                let template_content = template({'module_template' : template_content2, "search_query" : searchQuery, "isLoggedIn" : true});
-    
-                res.render("LandingPage", {backend_template : template_content})
-            })
-    
-            //res.render("LandingPage", {backend_template : template({test_header : 'Hello Nested back'})})
-           
-        })
+    const searchQuery = req.body.searchQuery;
+    const blogList = await getBlogList(searchQuery);
+    res.render("dashboard", { blog_list: blogList, isLoggedIn: true, search_query: searchQuery });
 })
 
 router.post("/postComment",async(req,res) =>{

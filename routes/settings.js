@@ -1,7 +1,5 @@
 const express = require("express");
-const fs = require("fs")
 const bcrypt = require('bcrypt')
-const ejs = require("ejs")
 const moment = require("moment")
 const router = express.Router()
 
@@ -54,45 +52,9 @@ router.get("/",async(req,res) => {
         console.error("Data Not Found ",e);
     }
     
-    console.log("userDetails ",userDetails);
-   // res.send("Inside Login Page");
-    //console.log("This is res :: ", res);
+    console.log("userDetails ", userDetails);
 
-    /*fs.readFile("./public/HTML/register_form.html",'utf8',function(err,data){
-        if(err){
-            console.log(err);
-            return;
-        }
-        //console.log(data);
-        //res.send({"html" : data});
-        //var htmlContent = "<b>HELLO</b>";
-        res.render("LandingPage", {backend_template : data})
-    })*/
-
-    fs.readFile("./public/HTML/common_navbar.html",'utf8',function(err,data){
-        if(err){
-            console.log(err);
-            return;
-        }
-        
-        var template = ejs.compile(data);
-        //console.log(blogList);
-        //let template_content = template({'blog_obj' : blog});
-        var template_content;
-        fs.readFile("./public/HTML/register_form.html",'utf8',function(err,data){
-            if(err){
-                console.log(err);
-                return;
-            }
-            let template2 = ejs.compile(data);
-            //let template_content2 = template2({'blog_obj' : blog, "comment_list" : [], "blog_List" : otherBlogs });
-            let template_content2 = template2({"user_details" : userDetails ,"getFormattedDate" : getFormattedDate});
-            let template_content = template({'module_template' : template_content2, "isLoggedIn" : true});
-
-            res.render("LandingPage", {backend_template : template_content})
-        })
-
-    })
+    res.render("settings", { user_details: userDetails, getFormattedDate, isLoggedIn: true });
 })
 
 router.post("/", (req,res) => {

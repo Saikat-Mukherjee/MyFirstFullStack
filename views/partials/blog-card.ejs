@@ -1,0 +1,9 @@
+<% blog_List.forEach(function(item) { %>
+<div class="sb-card" onclick="window.location.href='/blogs?id=<%= item._id %>'">
+  <img src="/uploads/blog images/<%= item.blogImage || '' %>" class="sb-thumb" alt="<%= item.title || '' %>">
+  <div class="sb-card-body">
+    <p class="sb-title"><%= item.title || '' %></p>
+    <span class="sb-time"><%= item.updatedAt ? getFormattedTime(item.updatedAt) : '' %></span>
+  </div>
+</div>
+<% }); %>
