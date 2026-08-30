@@ -3,7 +3,6 @@ if(process.env.NODE_ENV != 'production'){ //used for checking if the code runnin
 }
 
 const express = require("express");
-const fs = require("fs");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
@@ -53,19 +52,23 @@ const app = express()
 
 //console.log("Hello World before after refresh V2");
 
-app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({extended : true}))  //this line of code is required to access html body from backend
 app.use(express.json()) //to deal with json parameters
 
-app.set('view engine', 'html');
-
 app.use(express.static('public'));
 
 app.use(session({
-    secret: 'my secret',
+    secret: process.env.SESSION_SECRET || 'change-me-in-production',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+    }
 }))
 
 app.use(methodOverride('_method'))
@@ -103,22 +106,8 @@ function createSession(obj){
     console.log(user);
 }*/
 
-app.get("/login",isNotAuthenticated,(req,res) => {
-    //console.log("Hello World");
-
-    
-    //res.send("Hello World : Landing Page");
-   
-    fs.readFile("./public/HTML/login.html",'utf8',function(err,data){
-        if(err){
-            console.log(err);
-            return;
-        }
-        //console.log(data);
-        //res.send({"html" : data});
-        res.render("LandingPage", {backend_template : data});
-    })
-    //res.render("LandingPage", {backend_template : "World"})
+app.get("/login", isNotAuthenticated, (req, res) => {
+    res.render("login");
 })
 
 app.get("/loginPage",(req,res) => {

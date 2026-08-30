@@ -1,5 +1,4 @@
 const express = require("express");
-const fs = require("fs")
 const bcrypt = require('bcrypt')
 const router = express.Router()
 
@@ -14,22 +13,9 @@ async function saveData(data){
 }
 
 
-router.get("/",(req,res) => {
+router.get("/", (req, res) => {
     console.log("Inside Register JS");
-
-   // res.send("Inside Login Page");
-    //console.log("This is res :: ", res);
-
-    fs.readFile("./public/HTML/register_form.html",'utf8',function(err,data){
-        if(err){
-            console.log(err);
-            return;
-        }
-        //console.log(data);
-        //res.send({"html" : data});
-        //var htmlContent = "<b>HELLO</b>";
-        res.render("LandingPage", {backend_template : data})
-    })
+    res.render("register", { isLoggedIn: false });
 })
 
 router.post("/",async (req,res) => {

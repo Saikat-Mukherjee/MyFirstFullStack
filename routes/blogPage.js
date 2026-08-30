@@ -1,9 +1,7 @@
 const express = require("express");
-const fs = require("fs")
 const path = require("path");
 const moment = require("moment");
 const router = express.Router()
-const ejs = require("ejs")
 
 const Blog = require("../model/blogs");
 const BlogComment = require("../model/blogComments");
@@ -128,7 +126,7 @@ router.get("/",async (req,res) =>{
     console.log(searchQuery);
     let blogId = req.query.id;
     //const { page = 1, limit = 10 } = req.query;
-    const page = 1, limit = 10;
+    const page = 1, limit = 5; // Reduced initial limit for better lazy loading
     // Calculate the number of documents to skip
     const skip = (page - 1) * limit;
     //console.log(blogId);   
@@ -142,33 +140,14 @@ router.get("/",async (req,res) =>{
       }, {});
     
     console.log(blogComments);
-    //console.log(otherBlogs);
-    //res.json(blog);
-    fs.readFile("./public/HTML/common_navbar.html",'utf8',function(err,data){
-        if(err){
-            console.log(err);
-            return;
-        }
-        
-        var template = ejs.compile(data);
-        //console.log(blogList);
-        //let template_content = template({'blog_obj' : blog});
-        var template_content;
-        fs.readFile("./public/HTML/blogPage.html",'utf8',function(err,data){
-            if(err){
-                console.log(err);
-                return;
-            }
-            let template2 = ejs.compile(data);
-            let template_content2 = template2({'blog_obj' : blog, "comment_list" : [], "blog_List" : otherBlogs , "comment_list" : blogComments, "getUserName" : getUserName, "getFormattedTime" : getFormattedTime});
-            let template_content = template({'module_template' : template_content2});
-
-            res.render("LandingPage", {backend_template : template_content})
-        })
-
-        //res.render("LandingPage", {backend_template : template({test_header : 'Hello Nested back'})})
-       
-    })
+    res.render("blog", {
+        blog_obj: blog,
+        blog_List: otherBlogs,
+        comment_list: blogComments,
+        getUserName,
+        getFormattedTime,
+        isLoggedIn: true
+    });
 })
 
 router.post("/postComment",async(req,res) =>{
@@ -185,6 +164,30 @@ router.post("/postComment",async(req,res) =>{
         "blogId" : blogId
         }*/
 })
+
+// API endpoint for lazy loading more blogs
+router.get("/api/more-blogs", async (req, res) => {
+    try {
+        const { currentBlogId, page = 1, limit = 5 } = req.query;
+        const skip = (page - 1) * limit;
+        
+        const moreBlogs = await getOtherBlogList(currentBlogId, limit, skip);
+
+        req.app.render('partials/blog-card', { blog_List: moreBlogs, getFormattedTime }, (err, html) => {
+            if (err) {
+                console.error("Template render error:", err);
+                return res.status(500).json({ error: "Failed to render blog cards" });
+            }
+            res.json({
+                html,
+                hasMore: moreBlogs.length === parseInt(limit)
+            });
+        });
+    } catch (error) {
+        console.error("Error loading more blogs:", error);
+        res.status(500).json({ error: "Failed to load more blogs" });
+    }
+});
 
 
 module.exports = router;

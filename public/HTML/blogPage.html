@@ -1,36 +1,51 @@
-<div class ="row" style="height: 90vh;">
-    <div class ="col-10" style="height: 100%;">
-        <div class ="row" style="height: 50%;">
-            <div class ="col-12">
+<div class ="row" style="height: 90vh; padding: 20px;">
+    <div class ="col-10" style="height: 100%; padding-right: 30px;">
+        <div class ="row" style="height: auto; margin-bottom: 30px;">
+            <div class ="col-12" style="margin-bottom: 15px;">
                 <div class ="blog-title fs-2 text">
                     <%= blog_obj.title || "" %>
                 </div>
             </div>
-            <div class ="col-12">
+            <div class ="col-12" style="margin-bottom: 20px;">
                 <div class ="blog-body">
                     <%= blog_obj.content || "" %>  
                 </div>
             </div>
             <div class ="col-12">
                 <div class ="blog-footer d-flex float-end">
-                    <span role='button' class="material-symbols-outlined">
+                    <span id ="likeBtnId" role='button' class="material-symbols-outlined">
                         thumb_up
-                    </span> <%= blog_obj.likes || 0 %>
-                    <span role='button' class="material-symbols-outlined">
+                    </span> <span id="likeCount"><%= blog_obj.likes || 0 %></span>
+                    <span id ="disLikeBtnId" role='button' class="material-symbols-outlined">
                         thumb_down
-                    </span> <%= blog_obj.dislikes || 0 %>
+                    </span> <span id="dislikeCount"><%= blog_obj.dislikes || 0 %></span>
                     <!--i class="fa fa-comment"> Comment</i-->
                 </div>
             </div>
         </div>
         <div class ="row">
             <div class ="col-12">
-                <form method="POST" action="/postComment?id=<%= blog_obj._id || "" %>"> 
+                <form id="commentForm" method="POST" action="/postComment?id=<%= blog_obj._id || "" %>"> 
                 <div class ="user-blog-comment-container d-flex">
-                    <input placeholder="Write a comment..." name="blog-comment" style="width: 80%;" class="form-control form-control-sm">
-                    <button type="submit" class="btn btn-primary btn-sm rounded">
-                      Post
+                    <input 
+                        id="commentInput"
+                        placeholder="Write a comment..." 
+                        name="blog-comment" 
+                        style="width: 80%;" 
+                        class="form-control form-control-sm"
+                        maxlength="1000"
+                        required
+                        autocomplete="off"
+                    >
+                    <button id="postBtn" type="submit" class="btn btn-primary btn-sm rounded" disabled>
+                        <span class="btn-text">Post</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                     </button>
+                </div>
+                <div id="commentError" class="text-danger small mt-1" style="display: none;"></div>
+                <div id="commentSuccess" class="text-success small mt-1" style="display: none;"></div>
+                <div class="small text-muted mt-1">
+                    <span id="charCount">0</span>/1000 characters
                 </div>
                 </form>
             </div>
@@ -50,31 +65,414 @@
                     </div>
                 </div>
             <% }); %>
-            
-            <div class ="col-12">
-                
-            </div>
-            <div class ="col-12">
-                
-            </div>
         </div>
     </div>
     <div class ="col-2">
-        <div class ="row g-4">
+        <div class ="row g-4" id="sidebar-container" style="height: 90vh; overflow-y: auto;">
             <% blog_List.forEach(function(item, index) { %>
             <div class ="col-12">
-                <div class="card h-100">
-                    <img src="uploads/blog images/<%= item.blogImage || "" %>" class="card-img-top" width="200" height="200" alt="...">
+                <div class="card h-100" style="cursor: pointer;" onclick="window.location.href='/blog?id=<%= item._id %>'">
+                    <img src="uploads/blog images/<%= item.blogImage || "" %>" class="card-img-top" width="200" height="200" alt="<%= item.title || 'Blog image' %>">
                     <div class="card-body">
                       <h5 class="card-title blog-thumb-nail-title"> <%= item.title || "" %></h5>
-                      <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                      <p class="card-text"><%= item.content ? item.content.substring(0, 100) + '...' : 'No description available.' %></p>
                     </div>
                     <div class="card-footer">
-                      <small class="text-muted">Last updated 3 mins ago</small>
+                      <small class="text-muted">Last updated <%= item.updatedAt ? getFormattedTime(item.updatedAt) : 'recently' %></small>
                     </div>
                 </div>
             </div>
             <% }); %>
+            
+            <!-- Loading indicator -->
+            <div class="col-12" id="loading-indicator" style="display: none;">
+                <div class="text-center p-3">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 mb-0">Loading more blogs...</p>
+                </div>
+            </div>
+            
+            <!-- End of content indicator -->
+            <div class="col-12" id="end-indicator" style="display: none;">
+                <div class="text-center p-3">
+                    <p class="text-muted mb-0">No more blogs to load</p>
+                </div>
+            </div>
+            
+            <!-- Error indicator -->
+            <div class="col-12" id="error-indicator" style="display: none;">
+                <div class="text-center p-3">
+                    <p class="text-danger mb-2">Failed to load more blogs</p>
+                    <button class="btn btn-outline-primary btn-sm" onclick="retryLoading()">
+                        <i class="fa fa-refresh"></i> Retry
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Manual load more button (optional) -->
+            <div class="col-12" id="load-more-btn" style="display: none;">
+                <div class="text-center p-3">
+                    <button class="btn btn-primary btn-sm" onclick="loadMoreBlogs()">
+                        <i class="fa fa-plus"></i> Load More Blogs
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function(){
+        // Comment form validation and submission
+        const commentForm = $('#commentForm');
+        const commentInput = $('#commentInput');
+        const postBtn = $('#postBtn');
+        const charCount = $('#charCount');
+        const commentError = $('#commentError');
+        const commentSuccess = $('#commentSuccess');
+        
+        // Character count and validation
+        commentInput.on('input', function() {
+            const text = $(this).val().trim();
+            const length = text.length;
+            
+            charCount.text(length);
+            
+            // Enable/disable button based on content
+            if (length > 0 && length <= 1000) {
+                postBtn.prop('disabled', false);
+                commentError.hide();
+            } else {
+                postBtn.prop('disabled', true);
+                if (length > 1000) {
+                    commentError.text('Comment is too long. Maximum 1000 characters allowed.').show();
+                }
+            }
+            
+            // Update character count color
+            if (length > 900) {
+                charCount.addClass('text-danger').removeClass('text-warning text-muted');
+            } else if (length > 800) {
+                charCount.addClass('text-warning').removeClass('text-danger text-muted');
+            } else {
+                charCount.addClass('text-muted').removeClass('text-danger text-warning');
+            }
+        });
+        
+        // Form submission with AJAX
+        commentForm.on('submit', function(e) {
+            e.preventDefault();
+            
+            const commentText = commentInput.val().trim();
+            
+            // Validation
+            if (!commentText) {
+                commentError.text('Please write a comment before posting.').show();
+                commentInput.focus();
+                return;
+            }
+            
+            if (commentText.length > 1000) {
+                commentError.text('Comment is too long. Maximum 1000 characters allowed.').show();
+                return;
+            }
+            
+            // Disable form and show loading
+            postBtn.prop('disabled', true);
+            postBtn.find('.btn-text').text('Posting...');
+            postBtn.find('.spinner-border').removeClass('d-none');
+            commentError.hide();
+            commentSuccess.hide();
+            
+            // Submit via AJAX
+            $.ajax({
+                url: $(this).attr('action'),
+                method: 'POST',
+                data: $(this).serialize(),
+                headers: {
+                    'Accept': 'application/json'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        commentSuccess.text(response.message || 'Comment posted successfully!').show();
+                        commentInput.val('');
+                        charCount.text('0');
+                        
+                        // Optionally reload comments or add comment to DOM
+                        setTimeout(() => {
+                            location.reload(); // Reload to show new comment
+                        }, 1500);
+                    } else {
+                        commentError.text(response.message || 'Failed to post comment').show();
+                    }
+                },
+                error: function(xhr) {
+                    let errorMessage = 'An error occurred while posting your comment.';
+                    
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.status === 401) {
+                        errorMessage = 'Please log in to post comments.';
+                        setTimeout(() => {
+                            window.location.href = '/login';
+                        }, 2000);
+                    } else if (xhr.status === 429) {
+                        errorMessage = 'You are posting too quickly. Please wait a moment.';
+                    }
+                    
+                    commentError.text(errorMessage).show();
+                },
+                complete: function() {
+                    // Re-enable form
+                    postBtn.find('.btn-text').text('Post');
+                    postBtn.find('.spinner-border').addClass('d-none');
+                    
+                    const text = commentInput.val().trim();
+                    if (text.length > 0 && text.length <= 1000) {
+                        postBtn.prop('disabled', false);
+                    }
+                }
+            });
+        });
+        
+        // Enhanced like functionality
+        $('#likeBtnId').on('click',function(){
+            const $this = $(this);
+            const isCurrentlySelected = $this.hasClass("selected");
+            const newLikeState = !isCurrentlySelected;
+            
+            // Prevent spam clicking
+            if ($this.hasClass('processing')) return;
+            $this.addClass('processing');
+            
+            var likeCount = parseInt($('#likeCount').text()) || 0;
+            console.log("likeCount = ", likeCount);
+            console.log("newLikeState = ", newLikeState);
+            
+            fetch("/likeBlog?id=<%= blog_obj._id || "" %>",{
+                method: "POST",
+                headers:{
+                    "Content-Type" : "application/json"
+                },
+                body : JSON.stringify({isLiked : newLikeState})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data)
+                
+                if (data.success) {
+                    $this.toggleClass("selected");
+                    
+                    if (newLikeState) {
+                        likeCount++;
+                    } else {
+                        likeCount = Math.max(0, likeCount - 1);
+                    }
+                    
+                    $('#likeCount').text(likeCount);
+                    console.log("updated likeCount = ", likeCount);
+                    
+                    // If liking, remove dislike if selected
+                    if (newLikeState && $('#disLikeBtnId').hasClass('selected')) {
+                        $('#disLikeBtnId').removeClass('selected');
+                        const dislikeCount = Math.max(0, parseInt($('#dislikeCount').text()) - 1);
+                        $('#dislikeCount').text(dislikeCount);
+                    }
+                } else {
+                    alert(data.message || 'Failed to update like');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            })
+            .finally(() => {
+                $this.removeClass('processing');
+            });
+        });
+
+        // Enhanced dislike functionality
+        $('#disLikeBtnId').on('click',function(){
+            const $this = $(this);
+            const isCurrentlySelected = $this.hasClass("selected");
+            const newDislikeState = !isCurrentlySelected;
+            
+            // Prevent spam clicking
+            if ($this.hasClass('processing')) return;
+            $this.addClass('processing');
+            
+            var dislikeCount = parseInt($('#dislikeCount').text()) || 0;
+            console.log("dislikeCount = ", dislikeCount);
+            console.log("newDislikeState = ", newDislikeState);
+            
+            fetch("/dislikeBlog?id=<%= blog_obj._id || "" %>",{
+                method: "POST",
+                headers:{
+                    "Content-Type" : "application/json"
+                },
+                body : JSON.stringify({isDisliked : newDislikeState})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data)
+                
+                if (data.success) {
+                    $this.toggleClass("selected");
+                    
+                    if (newDislikeState) {
+                        dislikeCount++;
+                    } else {
+                        dislikeCount = Math.max(0, dislikeCount - 1);
+                    }
+                    
+                    $('#dislikeCount').text(dislikeCount);
+                    console.log("updated dislikeCount = ", dislikeCount);
+                    
+                    // If disliking, remove like if selected
+                    if (newDislikeState && $('#likeBtnId').hasClass('selected')) {
+                        $('#likeBtnId').removeClass('selected');
+                        const likeCount = Math.max(0, parseInt($('#likeCount').text()) - 1);
+                        $('#likeCount').text(likeCount);
+                    }
+                } else {
+                    alert(data.message || 'Failed to update dislike');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            })
+            .finally(() => {
+                $this.removeClass('processing');
+            });
+        });
+    });
+
+    // Lazy loading functionality
+    let currentPage = 2; // Start from page 2 since page 1 is already loaded
+    let isLoading = false;
+    let hasMoreContent = true;
+    
+    const sidebarContainer = document.getElementById('sidebar-container');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const endIndicator = document.getElementById('end-indicator');
+    const errorIndicator = document.getElementById('error-indicator');
+    
+    // Function to retry loading
+    window.retryLoading = function() {
+        errorIndicator.style.display = 'none';
+        loadMoreBlogs();
+    };
+    
+    // Function to load more blogs
+    async function loadMoreBlogs() {
+        if (isLoading || !hasMoreContent) return;
+        
+        isLoading = true;
+        loadingIndicator.style.display = 'block';
+        errorIndicator.style.display = 'none';
+        
+        try {
+            const response = await fetch(`/blog/api/more-blogs?currentBlogId=<%= blog_obj._id || "" %>&page=${currentPage}&limit=5`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.html && data.html.trim()) {
+                // Create a temporary container to hold the new HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = data.html;
+                
+                // Add fade-in animation to new cards
+                const newCards = tempDiv.querySelectorAll('.col-12');
+                newCards.forEach(card => {
+                    card.classList.add('fade-in');
+                });
+                
+                // Insert new cards before the loading indicator
+                while (tempDiv.firstChild) {
+                    sidebarContainer.insertBefore(tempDiv.firstChild, loadingIndicator);
+                }
+                
+                currentPage++;
+                hasMoreContent = data.hasMore;
+                
+                if (!hasMoreContent) {
+                    endIndicator.style.display = 'block';
+                }
+            } else {
+                hasMoreContent = false;
+                endIndicator.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error loading more blogs:', error);
+            errorIndicator.style.display = 'block';
+            // Don't set hasMoreContent to false on error, allow retry
+        } finally {
+            isLoading = false;
+            loadingIndicator.style.display = 'none';
+        }
+    }
+    
+    // Intersection Observer for infinite scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && hasMoreContent && !isLoading) {
+                loadMoreBlogs();
+            }
+        });
+    }, {
+        root: sidebarContainer,
+        rootMargin: '200px', // Start loading when 200px away from bottom
+        threshold: 0.1
+    });
+    
+    // Observe the loading indicator
+    observer.observe(loadingIndicator);
+    
+    // Performance optimization: throttled scroll event listener
+    let scrollTimeout;
+    sidebarContainer.addEventListener('scroll', () => {
+        if (scrollTimeout) {
+            clearTimeout(scrollTimeout);
+        }
+        
+        scrollTimeout = setTimeout(() => {
+            if (hasMoreContent && !isLoading) {
+                const scrollHeight = sidebarContainer.scrollHeight;
+                const scrollTop = sidebarContainer.scrollTop;
+                const clientHeight = sidebarContainer.clientHeight;
+                
+                // If scrolled to within 150px of bottom
+                if (scrollTop + clientHeight >= scrollHeight - 150) {
+                    loadMoreBlogs();
+                }
+            }
+        }, 100); // Throttle scroll events to every 100ms
+    });
+    
+    // Optional: Add keyboard navigation
+    sidebarContainer.addEventListener('keydown', (e) => {
+        if (e.key === 'Space' && hasMoreContent && !isLoading) {
+            e.preventDefault();
+            loadMoreBlogs();
+        }
+    });
+    
+    // Add tabindex to make sidebar focusable for keyboard navigation
+    sidebarContainer.setAttribute('tabindex', '0');
+</script>
